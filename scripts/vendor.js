@@ -1,7 +1,38 @@
-// Copies the Three.js r128 files the app needs from node_modules into www/vendor (no CDN at runtime).
-const fs=require('fs'),p=require('path');
-const out='www/vendor',base='node_modules/three/';
-fs.mkdirSync(out,{recursive:true});
-['build/three.min.js','examples/js/libs/mmdparser.min.js','examples/js/loaders/TGALoader.js','examples/js/loaders/MMDLoader.js','examples/js/controls/OrbitControls.js','examples/js/controls/TransformControls.js','examples/js/animation/CCDIKSolver.js']
- .forEach(f=>fs.copyFileSync(base+f,p.join(out,p.basename(f))));
-console.log('vendor files copied');
+const fs = require('fs');
+const path = require('path');
+
+const files = [
+  {
+    src: 'node_modules/three/build/three.min.js',
+    dest: 'www/vendor/three.min.js'
+  },
+  {
+    src: 'node_modules/three/examples/js/controls/OrbitControls.js',
+    dest: 'www/vendor/OrbitControls.js'
+  },
+  {
+    src: 'node_modules/three/examples/js/loaders/MMDLoader.js',
+    dest: 'www/vendor/MMDLoader.js'
+  },
+  {
+    src: 'node_modules/mmd-parser/build/mmdparser.min.js',
+    dest: 'www/vendor/mmdparser.min.js'
+  }
+];
+
+const destDir = path.join(__dirname, '../www/vendor');
+if (!fs.existsSync(destDir)) {
+  fs.mkdirSync(destDir, { recursive: true });
+}
+
+files.forEach(file => {
+  const srcPath = path.join(__dirname, '..', file.src);
+  const destPath = path.join(__dirname, '..', file.dest);
+  
+  if (fs.existsSync(srcPath)) {
+    fs.copyFileSync(srcPath, destPath);
+    console.log(`Copied ${file.src} -> ${file.dest}`);
+  } else {
+    console.warn(`File not found: ${file.src}`);
+  }
+});
